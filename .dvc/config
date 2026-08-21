@@ -1,4 +1,5 @@
 [core]
     remote = labstore
 ['remote "labstore"']
-    url = gs:///dvc
+    url = s3://income-lab-hanh-2a202601232/dvc
+    region = us-east-1
