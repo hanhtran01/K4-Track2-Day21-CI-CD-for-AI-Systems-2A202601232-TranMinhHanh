@@ -13,3 +13,5 @@ sa-key.json
 __pycache__/
 *.pyc
 .DS_Store
+.pytest_tmp/
+.pytest_cache/

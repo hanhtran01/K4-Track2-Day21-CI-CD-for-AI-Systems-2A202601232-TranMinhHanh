@@ -32,7 +32,7 @@ jobs:
 
       - name: Run unit tests
         # TODO 1: Viet lenh de chay pytest tren thu muc tests/ voi co -v
-        run: # <dien lenh o day>
+        run: pytest test/ -V
 
 
   # ---------------------------------------------------------------------------
@@ -65,12 +65,15 @@ jobs:
         #        echo "AWS_SECRET_ACCESS_KEY=..." >> $GITHUB_ENV
         # Azure: echo "AZURE_STORAGE_CONNECTION_STRING=..." >> $GITHUB_ENV
         run: |
-          # <dien code o day>
+          echo "AWS_ACCESS_KEY_ID=${{ secrets.AWS_ACCESS_KEY_ID }}" >> $GITHUB_ENV
+          echo "AWS_SECRET_ACCESS_KEY=${{ secrets.AWS_SECRET_ACCESS_KEY }}" >> $GITHUB_ENV
+          echo "AWS_DEFAULT_REGION=${{ secrets.AWS_DEFAULT_REGION }}" >> $GITHUB_ENV
+
 
       - name: Pull data with DVC
         # TODO 3: Pull cac file du lieu can thiet tu cloud storage bang lenh dvc pull.
         #         Chi pull train_batch1.csv va holdout.csv (khong can train_batch2.csv).
-        run: # <dien lenh o day>
+        run: dvc pull data/train_batch1.csv data/holdout.csv
 
       - name: Train model
         run: python src/train.py
@@ -84,7 +87,9 @@ jobs:
         #   F1=$(python -c "import json; d=json.load(open('outputs/report.json')); print(d['f1_score'])")
         #   echo "f1=$F1" >> $GITHUB_OUTPUT
         run: |
-          # <dien code o day>
+          F1=$(python -c "import json; print(json.load(open('outputs/report.json'))['f1_score'])")
+          echo "f1=$F1" >> $GITHUB_OUTPUT
+          echo "f1_score doc duoc: $F1"
 
       - name: Upload model to Cloud Storage
         # TODO 5: Su dung cloud SDK de upload models/model.joblib len
@@ -92,7 +97,12 @@ jobs:
         #         Ten bucket lay tu secret ARTIFACT_BUCKET.
         run: |
           python - <<'PYEOF'
-          # <dien code Python o day>
+                    import os
+          import boto3
+          bucket = os.environ["ARTIFACT_BUCKET"]
+          key = "artifacts/current/model.joblib"
+          boto3.client("s3").upload_file("models/model.joblib", bucket, key)
+          print(f"uploaded s3://{bucket}/{key}")
           PYEOF
 
       - name: Save report as artifact
@@ -130,7 +140,13 @@ jobs:
         #   print("PASSED: dang trien khai model.")
         run: |
           python - <<'PYEOF'
-          # <dien code Python o day>
+          import os, sys
+          f1 = float(os.environ["F1"])      # BAT BUOC float() - output la chuoi
+          threshold = 0.65
+          print(f"f1_score = {f1:.4f} | nguong = {threshold}")
+          if f1 < threshold:
+              sys.exit(f"BLOCKED: f1 {f1:.4f} < {threshold} - khong trien khai")
+          print("PASSED - cho phep trien khai")
           PYEOF
 
 
@@ -160,4 +176,7 @@ jobs:
             #   sudo systemctl restart income-api
             #   sleep 5
             #   curl -sf http://localhost:8080/healthz && echo "Health check passed." || exit 1
-            # <dien lenh bash o day>
+                        sudo systemctl restart income-api
+            sleep 8
+            curl -fsS http://localhost:8080/healthz || exit 1
+            echo "Deploy thanh cong"
