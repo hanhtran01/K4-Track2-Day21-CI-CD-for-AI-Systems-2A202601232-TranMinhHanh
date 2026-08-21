@@ -51,6 +51,6 @@ Lab triển khai trên AWS thay vì GCP, nên `STORAGE_CREDENTIALS` được tá
 | | f1_score | accuracy |
 |---|---|---|
 | Bước 2 (chỉ `train_batch1`) | 0.7222 | 0.880 |
-| Bước 3 (thêm `train_batch2`) | ___ | ___ |
+| Bước 3 (thêm `train_batch2`) | 0.7339 | 0.884 |
 
-**Nhận xét:** ___
+**Nhận xét:** Gấp đôi dữ liệu huấn luyện chỉ làm f1_score nhích lên 0,0117 và accuracy nhích lên 0,004. Mức cải thiện nhỏ này hợp lý vì hai batch được cắt ngẫu nhiên từ cùng một nguồn nên có cùng phân phối, dữ liệu mới không mang thêm thông tin mà mô hình chưa học được từ 22.361 mẫu đầu tiên. Điều Bước 3 thực sự kiểm chứng không phải chỉ số cao hơn mà là quy trình tự động chạy đúng: một commit thay đổi file `.dvc` đã kích hoạt trọn bốn job, huấn luyện lại trên 44.722 mẫu và triển khai mô hình mới lên VM mà không cần bất kỳ thao tác thủ công nào.
