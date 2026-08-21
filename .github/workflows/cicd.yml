@@ -95,9 +95,11 @@ jobs:
         # TODO 5: Su dung cloud SDK de upload models/model.joblib len
         #         <bucket>/artifacts/current/model.joblib.
         #         Ten bucket lay tu secret ARTIFACT_BUCKET.
+        env:
+          ARTIFACT_BUCKET: ${{ secrets.ARTIFACT_BUCKET }}
         run: |
           python - <<'PYEOF'
-                    import os
+          import os
           import boto3
           bucket = os.environ["ARTIFACT_BUCKET"]
           key = "artifacts/current/model.joblib"
@@ -138,6 +140,8 @@ jobs:
         #   if f1 < 0.65:
         #       raise SystemExit(f"FAILED: f1_score {f1:.4f} < 0.65. Huy trien khai.")
         #   print("PASSED: dang trien khai model.")
+        env:
+          F1: ${{ needs.train.outputs.f1 }}
         run: |
           python - <<'PYEOF'
           import os, sys
@@ -176,7 +180,7 @@ jobs:
             #   sudo systemctl restart income-api
             #   sleep 5
             #   curl -sf http://localhost:8080/healthz && echo "Health check passed." || exit 1
-                        sudo systemctl restart income-api
+            sudo systemctl restart income-api
             sleep 8
             curl -fsS http://localhost:8080/healthz || exit 1
             echo "Deploy thanh cong"
