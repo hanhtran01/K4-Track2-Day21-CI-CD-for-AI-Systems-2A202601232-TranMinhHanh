@@ -1,5 +1,5 @@
-# Sieu tham so cho mo hinh GradientBoostingClassifier
-# Thay doi cac gia tri nay giua cac lan chay de thi nghiem (Buoc 1)
-n_estimators: 200
-learning_rate: 0.05
-max_depth: 4
+﻿# Sieu tham so cho mo hinh GradientBoostingClassifier
+# TAM THOI ha thap de kiem chung quality gate - se khoi phuc ngay sau do
+n_estimators: 5
+learning_rate: 0.01
+max_depth: 1
